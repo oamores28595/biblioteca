@@ -1,0 +1,5 @@
+node_modules/
+database/biblioteca.db
+database/biblioteca.db-shm
+database/biblioteca.db-wal
+uploads/

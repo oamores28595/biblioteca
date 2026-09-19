@@ -1,0 +1,25 @@
+{
+  "name": "biblioteca-virtual-backend",
+  "version": "1.0.0",
+  "description": "API REST para el proyecto integrador Biblioteca Virtual (Node.js + Express + SQLite + búsqueda vectorial con Phi-3/Ollama)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node database/seed.js",
+    "indexar": "node database/indexar.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
