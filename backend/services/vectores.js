@@ -105,10 +105,10 @@ async function indexarLibro(db, libro, textoPdf) {
             insertar.run(libro.id_libro, fragmento, JSON.stringify(vector));
         }
 
-        console.log(`🧠 Libro "${libro.titulo}" indexado (${fragmentos.length} fragmento(s)).`);
+        console.log(`Libro "${libro.titulo}" indexado (${fragmentos.length} fragmento(s)).`);
     } catch (err) {
         // No queremos que un problema con Ollama impida crear/editar un libro.
-        console.error(`⚠️  No se pudo indexar "${libro.titulo}" para búsqueda por contenido:`, err.message);
+        console.error(`No se pudo indexar "${libro.titulo}" para búsqueda por contenido:`, err.message);
     }
 }
 
@@ -152,7 +152,7 @@ async function buscarPorContenido(db, consulta, idsExcluir = [], limite = 5) {
             .map(({ vector, ...resto }) => resto); // no mandamos el vector crudo al frontend
     } catch (err) {
         // Ollama caído, timeout, etc. → sin sugerencias, sin romper la búsqueda normal.
-        console.error('⚠️  Búsqueda por contenido no disponible en este momento:', err.message);
+        console.error('Búsqueda por contenido no disponible en este momento:', err.message);
         return [];
     }
 }
