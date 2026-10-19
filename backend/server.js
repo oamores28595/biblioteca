@@ -48,7 +48,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
     console.log('============================================');
-    console.log('  📚  Biblioteca Virtual — Servidor activo');
-    console.log(`  🌐  http://localhost:${PORT}`);
+    console.log('Biblioteca Virtual — Servidor activo');
+    console.log(`http://localhost:${PORT}`);
     console.log('============================================');
 });
