@@ -35,7 +35,7 @@ app.use('/api', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-    console.error('❌ Error no controlado en', req.method, req.originalUrl);
+    console.error('Error no controlado en', req.method, req.originalUrl);
     console.error(err.stack || err);
     if (res.headersSent) return next(err);
 
