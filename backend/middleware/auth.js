@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'clave-secreta-de-desarrollo-cambiar-en-produccion';
-const JWT_EXPIRA_EN = '8h';
+const JWT_EXPIRA_EN = '1h';
 
 function generarToken(bibliotecario) {
     return jwt.sign(
