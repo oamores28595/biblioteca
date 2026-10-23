@@ -22,6 +22,12 @@ if (!columnasLibros.includes('archivo_pdf')) {
     console.log('🔧 Migración aplicada: columna archivo_pdf añadida a libros');
 }
 
+const columnasBibliotecarios = db.prepare("PRAGMA table_info(bibliotecarios)").all().map(c => c.name);
+if (!columnasBibliotecarios.includes('rol')) {
+    db.exec("ALTER TABLE bibliotecarios ADD COLUMN rol TEXT NOT NULL DEFAULT 'lector' CHECK (rol IN ('administrador', 'lector'))");
+    console.log('🔧 Migración aplicada: las cuentas existentes requieren aprovisionamiento de administrador');
+}
+
 if (!dbExisted) {
     console.log('📚 Base de datos creada por primera vez en:', DB_PATH);
 }

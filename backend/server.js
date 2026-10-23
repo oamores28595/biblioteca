@@ -10,7 +10,7 @@ const librosRouter = require('./routes/libros');
 const usuariosRouter = require('./routes/usuarios');
 const prestamosRouter = require('./routes/prestamos');
 const categoriasRouter = require('./routes/categorias');
-const { verificarToken } = require('./middleware/auth');
+const { verificarToken, verificarAdministrador } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,10 +19,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
-app.use('/api/libros', verificarToken, librosRouter);
-app.use('/api/usuarios', verificarToken, usuariosRouter);
-app.use('/api/prestamos', verificarToken, prestamosRouter);
-app.use('/api/categorias', verificarToken, categoriasRouter);
+app.use('/api/libros', librosRouter);
+app.use('/api/usuarios', verificarToken, verificarAdministrador, usuariosRouter);
+app.use('/api/prestamos', verificarToken, verificarAdministrador, prestamosRouter);
+app.use('/api/categorias', categoriasRouter);
 
 app.get('/api/salud', (req, res) => {
     res.json({ estado: 'ok', mensaje: 'API de Biblioteca Virtual funcionando correctamente' });

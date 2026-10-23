@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS bibliotecarios (
     nombre_completo TEXT NOT NULL,
     correo          TEXT NOT NULL UNIQUE,
     password_hash   TEXT NOT NULL,
+    rol             TEXT NOT NULL DEFAULT 'lector' CHECK (rol IN ('administrador', 'lector')),
     fecha_registro  TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 

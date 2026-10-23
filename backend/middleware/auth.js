@@ -1,11 +1,19 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'clave-secreta-de-desarrollo-cambiar-en-produccion';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+    throw new Error('Configura JWT_SECRET con al menos 32 caracteres antes de iniciar el servidor.');
+}
 const JWT_EXPIRA_EN = '1h';
 
 function generarToken(bibliotecario) {
     return jwt.sign(
-        { id_bibliotecario: bibliotecario.id_bibliotecario, correo: bibliotecario.correo, nombre_completo: bibliotecario.nombre_completo },
+        {
+            id_bibliotecario: bibliotecario.id_bibliotecario,
+            correo: bibliotecario.correo,
+            nombre_completo: bibliotecario.nombre_completo,
+            rol: bibliotecario.rol,
+        },
         JWT_SECRET,
         { expiresIn: JWT_EXPIRA_EN }
     );
@@ -31,4 +39,11 @@ function verificarToken(req, res, next) {
     }
 }
 
-module.exports = { generarToken, verificarToken, JWT_SECRET };
+function verificarAdministrador(req, res, next) {
+    if (req.bibliotecario?.rol !== 'administrador') {
+        return res.status(403).json({ error: 'Se requieren permisos de administrador' });
+    }
+    next();
+}
+
+module.exports = { generarToken, verificarToken, verificarAdministrador, JWT_SECRET };

@@ -12,7 +12,7 @@
 
 <div class="paper-texture"></div>
 
-<section id="pantalla-auth" class="auth-shell">
+<section id="pantalla-auth" class="auth-shell" hidden>
   <div class="auth-card">
     <div class="auth-brand">
       <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,14 +21,11 @@
       </svg>
       <div>
         <p class="auth-brand-name">Bibliotheca</p>
-        <p class="auth-brand-sub">acceso del personal</p>
+        <p class="auth-brand-sub">acceso administrador</p>
       </div>
     </div>
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-form="login">Iniciar sesión</button>
-      <button class="auth-tab" data-form="registro">Crear cuenta</button>
-    </div>
+    <button type="button" class="btn btn-secondary auth-back" id="btn-volver-catalogo">Volver al catálogo</button>
 
     <form id="form-login" class="auth-form">
       <div class="form-field">
@@ -40,28 +37,12 @@
         <input id="login-password" type="password" required autocomplete="current-password" placeholder="••••••••">
       </div>
       <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-      <p class="auth-hint">Prueba con <strong>bibliotecario@biblioteca.com</strong> / <strong>biblioteca123</strong></p>
-    </form>
-
-    <form id="form-registro" class="auth-form" hidden>
-      <div class="form-field">
-        <label for="reg-nombre">Nombre completo</label>
-        <input id="reg-nombre" required placeholder="Tu nombre">
-      </div>
-      <div class="form-field">
-        <label for="reg-correo">Correo</label>
-        <input id="reg-correo" type="email" required placeholder="tú@biblioteca.com">
-      </div>
-      <div class="form-field">
-        <label for="reg-password">Contraseña</label>
-        <input id="reg-password" type="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+      <p class="auth-hint">Acceso exclusivo para administradores de la biblioteca.</p>
     </form>
   </div>
 </section>
 
-<div id="pantalla-app" hidden>
+<div id="pantalla-app">
 
 <header class="topbar">
   <div class="brand">
@@ -77,14 +58,15 @@
 
   <nav class="tabs" id="tabs">
     <button class="tab active" data-view="catalogo">Catálogo</button>
-    <button class="tab" data-view="prestamos">Préstamos</button>
-    <button class="tab" data-view="usuarios">Lectores</button>
-    <button class="tab" data-view="panel">Panel</button>
+    <button class="tab" data-view="prestamos" data-admin hidden>Préstamos</button>
+    <button class="tab" data-view="usuarios" data-admin hidden>Lectores</button>
+    <button class="tab" data-view="panel" data-admin hidden>Panel</button>
   </nav>
 
   <div class="topbar-user">
-    <span id="topbar-user-nombre">—</span>
-    <button class="btn btn-secondary" id="btn-logout" title="Cerrar sesión">Salir</button>
+    <span id="topbar-user-nombre" hidden></span>
+    <button class="btn btn-secondary" id="btn-login">Acceso administrador</button>
+    <button class="btn btn-secondary" id="btn-logout" title="Cerrar sesión" hidden>Salir</button>
   </div>
 </header>
 
@@ -96,7 +78,7 @@
         <p class="eyebrow">Fondo bibliográfico</p>
         <h1>El catálogo</h1>
       </div>
-      <button class="btn btn-primary" id="btn-nuevo-libro">+ Añadir libro</button>
+      <button class="btn btn-primary" id="btn-nuevo-libro" data-admin hidden>+ Añadir libro</button>
     </div>
 
     <div class="toolbar">
@@ -114,7 +96,7 @@
     </div>
 
     <div class="shelf" id="shelf-libros"></div>
-    <p class="empty-state" id="catalogo-vacio" hidden>No se encontró ningún libro con esos criterios. Prueba otra búsqueda o añade uno nuevo.</p>
+    <p class="empty-state" id="catalogo-vacio" hidden>No se encontró ningún libro con esos criterios. Prueba otra búsqueda.</p>
 
     <div id="bloque-sugerencias" hidden>
       <div class="sugerencias-encabezado">

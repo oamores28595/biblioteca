@@ -1,6 +1,6 @@
-# 📚 Bibliotheca — Biblioteca Virtual (con búsqueda vectorial integrada, Phi-3 + Ollama)
+# 📚 Bibliotheca — Catálogo público y administración de biblioteca
 
-Proyecto integrador full-stack: catálogo, lectores, préstamos, login del personal, carga de PDFs, y **búsqueda por contenido semántico** integrada en la misma barra de búsqueda, usando una base de datos vectorial propia y **Phi-3** (vía Ollama).
+Proyecto integrador full-stack: catálogo público, gestión administrativa de lectores y préstamos, carga de PDFs, y **búsqueda por contenido semántico** integrada en la misma barra de búsqueda, usando una base de datos vectorial propia y **Phi-3** (vía Ollama).
 
 **Stack:** Node.js + Express (API REST) · SQLite (`better-sqlite3`) · JWT + bcrypt (login) · `multer` + `pdf-parse` (carga y lectura de PDFs) · HTML/CSS/JavaScript puro (frontend) · Ollama + Phi-3 (embeddings y base de datos vectorial).
 
@@ -11,11 +11,21 @@ Proyecto integrador full-stack: catálogo, lectores, préstamos, login del perso
 ```bash
 cd backend
 npm install
-npm run seed       # datos de ejemplo + 1 cuenta de bibliotecario
+```
+
+Configura la clave JWT y las credenciales del primer administrador en la misma terminal. En PowerShell:
+```powershell
+$env:JWT_SECRET = [Convert]::ToBase64String([byte[]](1..48 | ForEach-Object { Get-Random -Maximum 256 }))
+$env:ADMIN_NOMBRE = "Administración de Biblioteca"
+$env:ADMIN_CORREO = "admin@biblioteca.edu"
+$env:ADMIN_PASSWORD = "usa-una-clave-segura-de-12-caracteres"
+npm run seed
 npm start
 ```
 
-Abre `http://localhost:3000`. Usa `bibliotecario@biblioteca.com` / `biblioteca123`, o crea tu propia cuenta.
+Abre `http://localhost:3000`. El catálogo y la búsqueda son públicos. El botón **Acceso administrador** abre el login de las cuentas administrativas provisionadas con `npm run seed`. El registro público está deshabilitado. En bases de datos existentes, las cuentas previas no conservan permisos automáticamente: aprovisiona explícitamente las cuentas autorizadas con el seed. Conserva el mismo `JWT_SECRET` en cada reinicio del servidor y entre sus instancias; cambiarlo invalida las sesiones activas.
+
+Para dar de alta o actualizar cuentas administrativas, vuelve a ejecutar `npm run seed` con `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD` configurados para esa cuenta. Las contraseñas deben tener al menos 12 caracteres. Configura `JWT_SECRET` antes de iniciar el servidor; debe tener al menos 32 caracteres y mantenerse privado.
 
 Si tienes Ollama corriendo, después del seed puedes generar los embeddings de los libros de ejemplo:
 ```bash
@@ -24,7 +34,9 @@ npm run indexar
 
 ## 2. Módulos
 
-- **Login / registro** del personal, con JWT (8h) y contraseñas cifradas con bcrypt.
+- **Login administrativo** con JWT (1h) y contraseñas cifradas con bcrypt. El registro público está deshabilitado.
+- **Catálogo público**: estudiantes pueden consultar y buscar libros sin iniciar sesión.
+- **Permisos**: solo cuentas con rol de administrador pueden cargar, editar o eliminar libros, y gestionar préstamos, lectores y el panel.
 - **Catálogo**: crear, editar, eliminar, buscar y filtrar libros por categoría/disponibilidad. Cada libro puede tener un **PDF adjunto**.
 - **Préstamos**: registrar y devolver préstamos, con control de ejemplares disponibles, vencimiento a 14 días, y detección de atrasados.
 - **Lectores**: registro de usuarios que piden prestado.
@@ -95,9 +107,12 @@ biblioteca-virtual/
 | Método | Ruta | Descripción |
 |---|---|---|
 | POST | `/api/auth/login`, `/api/auth/registro` | Autenticación (públicas) |
-| GET | `/api/libros?q=...&categoria=...&disponibles=true` | Catálogo. Devuelve `{ resultados, sugerencias }` |
-| POST | `/api/libros` | Crear libro (multipart/form-data, PDF opcional en el campo `pdf`) |
-| PUT | `/api/libros/:id` | Editar libro (PDF opcional, reemplaza el anterior) |
-| GET | `/api/libros/:id/pdf?token=...` | Ver el PDF del libro |
-| DELETE | `/api/libros/:id` | Eliminar libro (borra también su PDF y sus embeddings) |
-| GET/POST | `/api/usuarios`, `/api/prestamos`, `/api/categorias` | Resto de módulos (protegidos con JWT) |
+| GET | `/api/libros?q=...&categoria=...&disponibles=true` | Catálogo público. Devuelve `{ resultados, sugerencias }` |
+| GET | `/api/categorias` | Categorías públicas para filtrar el catálogo |
+| POST | `/api/libros` | Crear libro (multipart/form-data, PDF opcional en el campo `pdf`; requiere administrador) |
+| PUT | `/api/libros/:id` | Editar libro (PDF opcional, reemplaza el anterior; requiere administrador) |
+| GET | `/api/libros/:id/pdf?token=...` | Ver PDF (requiere administrador) |
+| DELETE | `/api/libros/:id` | Eliminar libro (borra también su PDF y sus embeddings; requiere administrador) |
+| GET/POST | `/api/usuarios`, `/api/prestamos` | Módulos de administración (requieren administrador) |
+| GET | `/api/categorias` | Categorías públicas |
+| POST | `/api/categorias` | Crear categoría (requiere administrador) |

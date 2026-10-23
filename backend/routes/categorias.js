@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const { verificarToken, verificarAdministrador } = require('../middleware/auth');
 
 router.get('/', (req, res) => {
     res.json(db.prepare('SELECT * FROM categorias ORDER BY nombre ASC').all());
 });
 
-router.post('/', (req, res) => {
+router.post('/', verificarToken, verificarAdministrador, (req, res) => {
     const { nombre } = req.body;
     if (!nombre) return res.status(400).json({ error: 'nombre es obligatorio' });
 

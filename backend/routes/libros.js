@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const { indexarLibro, buscarPorContenido } = require('../services/vectores');
+const { verificarToken, verificarAdministrador } = require('../middleware/auth');
 
 const CARPETA_PDFS = path.join(__dirname, '..', 'uploads', 'pdfs');
 fs.mkdirSync(CARPETA_PDFS, { recursive: true });
@@ -109,7 +110,7 @@ router.get('/:id', (req, res) => {
 });
 
 // POST /api/libros → crear libro (multipart/form-data, PDF opcional en "pdf")
-router.post('/', upload.single('pdf'), (req, res) => {
+router.post('/', verificarToken, verificarAdministrador, upload.single('pdf'), (req, res) => {
     const { titulo, autor, isbn, anio_publicacion, id_categoria, sinopsis, portada_url } = req.body;
     const ejemplares_totales = Number(req.body.ejemplares_totales);
 
@@ -145,7 +146,7 @@ router.post('/', upload.single('pdf'), (req, res) => {
 });
 
 // PUT /api/libros/:id → actualizar libro (PDF opcional; solo se reemplaza si se manda uno nuevo)
-router.put('/:id', upload.single('pdf'), (req, res) => {
+router.put('/:id', verificarToken, verificarAdministrador, upload.single('pdf'), (req, res) => {
     const existente = db.prepare('SELECT * FROM libros WHERE id_libro = ?').get(req.params.id);
     if (!existente) {
         if (req.file) fs.unlink(req.file.path, () => {});
@@ -193,7 +194,7 @@ router.put('/:id', upload.single('pdf'), (req, res) => {
 // El token viaja como ?token= porque al abrir esto en una pestaña nueva
 // (window.open) el navegador no permite mandar el header Authorization normal.
 // El middleware verificarToken (montado en server.js) ya acepta ambas formas.
-router.get('/:id/pdf', (req, res) => {
+router.get('/:id/pdf', verificarToken, verificarAdministrador, (req, res) => {
     const libro = db.prepare('SELECT archivo_pdf, titulo FROM libros WHERE id_libro = ?').get(req.params.id);
     if (!libro || !libro.archivo_pdf) {
         return res.status(404).send('Este libro no tiene un PDF cargado.');
@@ -210,7 +211,7 @@ router.get('/:id/pdf', (req, res) => {
 
 // DELETE /api/libros/:id → eliminar libro (y su PDF, si tenía uno; los
 // embeddings se borran solos por el ON DELETE CASCADE de la tabla)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verificarToken, verificarAdministrador, (req, res) => {
     const libro = db.prepare('SELECT archivo_pdf FROM libros WHERE id_libro = ?').get(req.params.id);
     const info = db.prepare('DELETE FROM libros WHERE id_libro = ?').run(req.params.id);
     if (info.changes === 0) return res.status(404).json({ error: 'Libro no encontrado' });

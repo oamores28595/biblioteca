@@ -7,6 +7,7 @@ const estado = {
   usuarios: [],
   prestamos: [],
   filtroEstadoPrestamo: '',
+  esAdmin: false,
 };
 
 async function api(path, opciones = {}) {
@@ -21,7 +22,7 @@ async function api(path, opciones = {}) {
     ...opciones,
   });
 
-  if (res.status === 401 && path !== '/auth/login' && path !== '/auth/registro') {
+  if (res.status === 401 && path !== '/auth/login') {
     cerrarSesion('Tu sesión expiró. Inicia sesión de nuevo.');
     throw new Error('Sesión expirada');
   }
@@ -69,6 +70,7 @@ function debounce(fn, ms) {
 document.getElementById('tabs').addEventListener('click', (e) => {
   const btn = e.target.closest('.tab');
   if (!btn) return;
+  if (btn.dataset.admin !== undefined && !estado.esAdmin) return;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   const vista = btn.dataset.view;
@@ -161,9 +163,9 @@ function tarjetaLibro(libro, esSugerencia = false) {
         <span class="libro-stock ${sinStock ? 'bajo' : 'ok'}">${libro.ejemplares_disponibles}/${libro.ejemplares_totales} disp.</span>
       </div>
       <div class="libro-acciones">
-        ${libro.archivo_pdf ? `<button class="btn btn-secondary" data-accion="ver-pdf" data-id="${libro.id_libro}">📄 Ver PDF</button>` : ''}
-        <button class="btn btn-secondary" data-accion="editar-libro" data-id="${libro.id_libro}">Editar</button>
-        <button class="btn btn-danger" data-accion="borrar-libro" data-id="${libro.id_libro}">Quitar</button>
+        ${estado.esAdmin && libro.archivo_pdf ? `<button class="btn btn-secondary" data-accion="ver-pdf" data-id="${libro.id_libro}">📄 Ver PDF</button>` : ''}
+        ${estado.esAdmin ? `<button class="btn btn-secondary" data-accion="editar-libro" data-id="${libro.id_libro}">Editar</button>` : ''}
+        ${estado.esAdmin ? `<button class="btn btn-danger" data-accion="borrar-libro" data-id="${libro.id_libro}">Quitar</button>` : ''}
       </div>
     </article>
   `;
@@ -176,6 +178,7 @@ document.getElementById('check-disponibles').addEventListener('change', cargarLi
 async function manejarClicLibro(e) {
   const btn = e.target.closest('button[data-accion]');
   if (!btn) return;
+  if (!estado.esAdmin) return;
   const id = btn.dataset.id;
 
   if (btn.dataset.accion === 'ver-pdf') {
@@ -510,14 +513,15 @@ async function cargarEstadisticas() {
 const pantallaAuth = document.getElementById('pantalla-auth');
 const pantallaApp = document.getElementById('pantalla-app');
 
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const esLogin = tab.dataset.form === 'login';
-    document.getElementById('form-login').hidden = !esLogin;
-    document.getElementById('form-registro').hidden = esLogin;
-  });
+document.getElementById('btn-login').addEventListener('click', () => {
+  pantallaApp.hidden = true;
+  pantallaAuth.hidden = false;
+  document.getElementById('login-correo').focus();
+});
+
+document.getElementById('btn-volver-catalogo').addEventListener('click', () => {
+  pantallaAuth.hidden = true;
+  pantallaApp.hidden = false;
 });
 
 document.getElementById('form-login').addEventListener('submit', async (e) => {
@@ -527,20 +531,7 @@ document.getElementById('form-login').addEventListener('submit', async (e) => {
   try {
     const data = await api('/auth/login', { method: 'POST', body: JSON.stringify({ correo, password }) });
     iniciarSesion(data.token, data.bibliotecario);
-  } catch (err) {
-    mostrarToast(err.message, 'error');
-  }
-});
-
-document.getElementById('form-registro').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const nombre_completo = document.getElementById('reg-nombre').value.trim();
-  const correo = document.getElementById('reg-correo').value.trim();
-  const password = document.getElementById('reg-password').value;
-  try {
-    const data = await api('/auth/registro', { method: 'POST', body: JSON.stringify({ nombre_completo, correo, password }) });
-    iniciarSesion(data.token, data.bibliotecario);
-    mostrarToast('Cuenta creada. ¡Bienvenido/a!');
+    document.getElementById('form-login').reset();
   } catch (err) {
     mostrarToast(err.message, 'error');
   }
@@ -557,25 +548,41 @@ function iniciarSesion(token, bibliotecario) {
 function cerrarSesion(mensaje) {
   localStorage.removeItem('bv_token');
   localStorage.removeItem('bv_bibliotecario');
-  pantallaApp.hidden = true;
-  pantallaAuth.hidden = false;
+  estado.esAdmin = false;
+  document.querySelectorAll('[data-admin]').forEach(elemento => { elemento.hidden = true; });
+  document.getElementById('topbar-user-nombre').hidden = true;
+  document.getElementById('btn-logout').hidden = true;
+  document.getElementById('btn-login').hidden = false;
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.view === 'catalogo'));
+  document.querySelectorAll('.view').forEach(vista => vista.classList.toggle('active', vista.id === 'view-catalogo'));
+  renderizarLibros();
+  renderizarSugerencias();
+  pantallaApp.hidden = false;
+  pantallaAuth.hidden = true;
   document.getElementById('form-login').reset();
   if (mensaje) mostrarToast(mensaje, 'error');
 }
 
 function mostrarApp(bibliotecario) {
-  document.getElementById('topbar-user-nombre').textContent = bibliotecario.nombre_completo;
+  estado.esAdmin = bibliotecario.rol === 'administrador';
+  document.querySelectorAll('[data-admin]').forEach(elemento => { elemento.hidden = !estado.esAdmin; });
+  const nombre = document.getElementById('topbar-user-nombre');
+  nombre.textContent = bibliotecario.nombre_completo;
+  nombre.hidden = !estado.esAdmin;
+  document.getElementById('btn-login').hidden = estado.esAdmin;
+  document.getElementById('btn-logout').hidden = !estado.esAdmin;
   pantallaAuth.hidden = true;
   pantallaApp.hidden = false;
+  renderizarLibros();
   cargarApp();
 }
 
 async function cargarApp() {
   try {
-    await cargarCategorias();
-    await cargarLibros();
-    await cargarUsuarios();
-    await cargarPrestamos();
+    await Promise.all([cargarCategorias(), cargarLibros()]);
+    if (estado.esAdmin) {
+      await Promise.all([cargarUsuarios(), cargarPrestamos()]);
+    }
   } catch (err) {
     mostrarToast('No se pudo conectar con el servidor. ¿Está corriendo el backend?', 'error');
     console.error(err);
@@ -586,8 +593,22 @@ async function cargarApp() {
   const token = localStorage.getItem('bv_token');
   const bibliotecarioGuardado = localStorage.getItem('bv_bibliotecario');
   if (token && bibliotecarioGuardado) {
-    mostrarApp(JSON.parse(bibliotecarioGuardado));
+    try {
+      const bibliotecario = JSON.parse(bibliotecarioGuardado);
+      if (bibliotecario.rol === 'administrador') {
+        mostrarApp(bibliotecario);
+        return;
+      }
+    } catch (err) {
+      console.error('No se pudo recuperar la sesión guardada:', err);
+    }
+    localStorage.removeItem('bv_token');
+    localStorage.removeItem('bv_bibliotecario');
   } else {
-    pantallaAuth.hidden = false;
+    localStorage.removeItem('bv_token');
+    localStorage.removeItem('bv_bibliotecario');
   }
+  pantallaAuth.hidden = true;
+  pantallaApp.hidden = false;
+  cargarApp();
 })();
