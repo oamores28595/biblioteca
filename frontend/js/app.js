@@ -163,7 +163,7 @@ function tarjetaLibro(libro, esSugerencia = false) {
         <span class="libro-stock ${sinStock ? 'bajo' : 'ok'}">${libro.ejemplares_disponibles}/${libro.ejemplares_totales} disp.</span>
       </div>
       <div class="libro-acciones">
-        ${estado.esAdmin && libro.archivo_pdf ? `<button class="btn btn-secondary" data-accion="ver-pdf" data-id="${libro.id_libro}">📄 Ver PDF</button>` : ''}
+        ${libro.archivo_pdf ? `<button class="btn btn-secondary" data-accion="ver-pdf" data-id="${libro.id_libro}">📄 Ver PDF</button>` : ''}
         ${estado.esAdmin ? `<button class="btn btn-secondary" data-accion="editar-libro" data-id="${libro.id_libro}">Editar</button>` : ''}
         ${estado.esAdmin ? `<button class="btn btn-danger" data-accion="borrar-libro" data-id="${libro.id_libro}">Quitar</button>` : ''}
       </div>
@@ -178,14 +178,13 @@ document.getElementById('check-disponibles').addEventListener('change', cargarLi
 async function manejarClicLibro(e) {
   const btn = e.target.closest('button[data-accion]');
   if (!btn) return;
-  if (!estado.esAdmin) return;
   const id = btn.dataset.id;
 
   if (btn.dataset.accion === 'ver-pdf') {
-    const token = localStorage.getItem('bv_token');
-    window.open(`${API}/libros/${id}/pdf?token=${encodeURIComponent(token)}`, '_blank');
+    window.open(`${API}/libros/${id}/pdf`, '_blank');
     return;
   }
+  if (!estado.esAdmin) return;
   if (btn.dataset.accion === 'editar-libro') {
     const libro = [...estado.libros, ...estado.sugerencias].find(l => String(l.id_libro) === id);
     abrirFormularioLibro(libro);

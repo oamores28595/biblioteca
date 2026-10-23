@@ -73,7 +73,7 @@ export OLLAMA_UMBRAL_SIMILITUD="0.5"       # qué tan parecido debe ser algo par
 
 ## 4. Carga de PDFs
 
-Al añadir o editar un libro puedes adjuntar un PDF (máx. 20 MB). Se guarda en `backend/uploads/pdfs/` con un nombre generado por el servidor (no el original). Cada libro con PDF muestra un botón **"📄 Ver PDF"** que lo abre en una pestaña nueva — la ruta que lo sirve exige el mismo token de sesión que el resto de la API (viaja como `?token=` porque `window.open` no puede mandar headers personalizados).
+Al añadir o editar un libro puedes adjuntar un PDF (máx. 20 MB). Se guarda en `backend/uploads/pdfs/` con un nombre generado por el servidor (no el original). Cada libro con PDF muestra un botón **"📄 Ver PDF"** en el catálogo público, que lo abre en una pestaña nueva sin necesidad de iniciar sesión.
 
 Si reemplazas o eliminas un libro con PDF, el archivo viejo se borra solo del servidor.
 
@@ -111,7 +111,7 @@ biblioteca-virtual/
 | GET | `/api/categorias` | Categorías públicas para filtrar el catálogo |
 | POST | `/api/libros` | Crear libro (multipart/form-data, PDF opcional en el campo `pdf`; requiere administrador) |
 | PUT | `/api/libros/:id` | Editar libro (PDF opcional, reemplaza el anterior; requiere administrador) |
-| GET | `/api/libros/:id/pdf?token=...` | Ver PDF (requiere administrador) |
+| GET | `/api/libros/:id/pdf` | Ver el PDF adjunto (público) |
 | DELETE | `/api/libros/:id` | Eliminar libro (borra también su PDF y sus embeddings; requiere administrador) |
 | GET/POST | `/api/usuarios`, `/api/prestamos` | Módulos de administración (requieren administrador) |
 | GET | `/api/categorias` | Categorías públicas |

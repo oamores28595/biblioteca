@@ -190,11 +190,8 @@ router.put('/:id', verificarToken, verificarAdministrador, upload.single('pdf'),
     indexarEnSegundoPlano(req.params.id);
 });
 
-// GET /api/libros/:id/pdf → abrir el PDF guardado del libro
-// El token viaja como ?token= porque al abrir esto en una pestaña nueva
-// (window.open) el navegador no permite mandar el header Authorization normal.
-// El middleware verificarToken (montado en server.js) ya acepta ambas formas.
-router.get('/:id/pdf', verificarToken, verificarAdministrador, (req, res) => {
+// GET /api/libros/:id/pdf → abrir el PDF público guardado del libro
+router.get('/:id/pdf', (req, res) => {
     const libro = db.prepare('SELECT archivo_pdf, titulo FROM libros WHERE id_libro = ?').get(req.params.id);
     if (!libro || !libro.archivo_pdf) {
         return res.status(404).send('Este libro no tiene un PDF cargado.');
