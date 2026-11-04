@@ -156,7 +156,7 @@ function tarjetaLibro(libro, esSugerencia = false) {
   return `
     <article class="libro-card ${sinStock ? 'sin-stock' : ''} ${esSugerencia ? 'es-sugerencia' : ''}">
       <span class="libro-signatura">${signatura(libro)}</span>
-      <h3 class="libro-titulo">${escapeHtml(libro.titulo)}</h3>
+      <h2 class="libro-titulo">${escapeHtml(libro.titulo)}</h2>
       <p class="libro-autor">${escapeHtml(libro.autor)}${libro.anio_publicacion ? ' · ' + libro.anio_publicacion : ''}</p>
       <div class="libro-meta">
         <span class="libro-categoria">${libro.categoria_nombre || 'Sin categoría'}</span>
@@ -426,7 +426,7 @@ function renderizarUsuarios() {
   grid.innerHTML = estado.usuarios.map(u => `
     <article class="reader-card">
       <div class="reader-avatar">${iniciales(u.nombre_completo)}</div>
-      <h3 class="reader-name">${escapeHtml(u.nombre_completo)}</h3>
+      <h2 class="reader-name">${escapeHtml(u.nombre_completo)}</h2>
       <p class="reader-mail">${escapeHtml(u.correo)}</p>
       <span class="reader-stat">Lector desde ${formatearFecha(u.fecha_registro)}</span>
     </article>

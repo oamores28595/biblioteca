@@ -6,10 +6,11 @@
   --papel-alto: #FBF7EC;
   --tinta: #241F1A;
   --tinta-suave: #58493B;
-  --latón: #B08A3E;
+  --latón: #735318;
   --latón-claro: #D8B876;
   --sello: #A23B2E;
   --linea: rgba(36, 31, 26, 0.14);
+  --borde-control: #80776A;
   --sombra: 0 1px 2px rgba(36,31,26,0.06), 0 8px 24px -12px rgba(36,31,26,0.25);
 
   --f-display: "Fraunces", serif;
@@ -62,7 +63,7 @@ button, input, select { font-family: inherit; }
 
 .auth-tabs { display: flex; gap: 4px; background: var(--papel); padding: 4px; border-radius: 999px; margin-bottom: 22px; }
 .auth-tab {
-  flex: 1; border: none; background: transparent; color: var(--tinta-suave); opacity: 0.8;
+  flex: 1; border: none; background: transparent; color: var(--tinta-suave);
   padding: 9px 12px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 600;
 }
 .auth-tab.active { opacity: 1; background: var(--verde-800); color: var(--papel-alto); }
@@ -74,7 +75,7 @@ button, input, select { font-family: inherit; }
 
 .topbar-user { display: flex; align-items: center; gap: 12px; }
 .topbar-user span { font-size: 13.5px; color: var(--papel-alto); opacity: 0.85; }
-.topbar-user .btn-secondary { border-color: rgba(251,247,236,0.35); color: var(--papel-alto); padding: 7px 14px; font-size: 13px; }
+.topbar-user .btn-secondary { border-color: var(--papel-alto); color: var(--papel-alto); padding: 7px 14px; font-size: 13px; }
 .topbar-user .btn-secondary:hover { border-color: var(--papel-alto); background: rgba(251,247,236,0.08); }
 
 @media (max-width: 720px) {
@@ -133,9 +134,9 @@ button, input, select { font-family: inherit; }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--verde-800); color: var(--papel-alto); box-shadow: var(--sombra); }
 .btn-primary:hover { background: var(--verde-600); }
-.btn-secondary { background: transparent; color: var(--verde-800); border: 1.5px solid var(--linea); }
+.btn-secondary { background: transparent; color: var(--verde-800); border: 1.5px solid var(--borde-control); }
 .btn-secondary:hover { border-color: var(--verde-800); }
-.btn-danger { background: transparent; color: var(--sello); border: 1.5px solid rgba(162,59,46,0.35); }
+.btn-danger { background: transparent; color: var(--sello); border: 1.5px solid var(--sello); }
 .btn-danger:hover { background: rgba(162,59,46,0.08); }
 .btn-block { width: 100%; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -144,12 +145,13 @@ button, input, select { font-family: inherit; }
 .toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
 .search-field {
   display: flex; align-items: center; gap: 8px; background: var(--papel-alto);
-  border: 1px solid var(--linea); border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 240px;
+  border: 1px solid var(--borde-control); border-radius: 8px; padding: 10px 14px; flex: 1; min-width: 240px;
   color: var(--tinta-suave);
 }
 .search-field input { border: none; outline: none; background: transparent; flex: 1; font-size: 14px; color: var(--tinta); }
+input::placeholder, textarea::placeholder { color: var(--tinta-suave); opacity: 1; }
 #select-categoria {
-  background: var(--papel-alto); border: 1px solid var(--linea); border-radius: 8px;
+  background: var(--papel-alto); border: 1px solid var(--borde-control); border-radius: 8px;
   padding: 10px 12px; font-size: 14px; color: var(--tinta); cursor: pointer;
 }
 .check-field { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--tinta-suave); cursor: pointer; }
@@ -157,7 +159,7 @@ button, input, select { font-family: inherit; }
 
 .filter-pills { display: flex; gap: 6px; }
 .pill {
-  border: 1px solid var(--linea); background: var(--papel-alto); color: var(--tinta-suave);
+  border: 1px solid var(--borde-control); background: var(--papel-alto); color: var(--tinta-suave);
   padding: 8px 16px; border-radius: 999px; cursor: pointer; font-size: 13px; font-weight: 600;
 }
 .pill.active { background: var(--verde-800); color: var(--papel-alto); border-color: var(--verde-800); }
@@ -260,7 +262,7 @@ button, input, select { font-family: inherit; }
 .form-field { margin-bottom: 14px; }
 .form-field label { display: block; font-size: 12.5px; font-weight: 600; color: var(--tinta-suave); margin-bottom: 6px; }
 .form-field input, .form-field select, .form-field textarea {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--linea); border-radius: 8px; font-size: 14px;
+  width: 100%; padding: 10px 12px; border: 1px solid var(--borde-control); border-radius: 8px; font-size: 14px;
   background: var(--papel); color: var(--tinta); outline: none;
 }
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--verde-800); }
