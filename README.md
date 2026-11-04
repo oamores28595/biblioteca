@@ -1,4 +1,4 @@
-# BiblioAgro — Catálogo público y administración de biblioteca
+# BiblioFCA — Catálogo público y administración de biblioteca
 
 Proyecto integrador full-stack: catálogo público, gestión administrativa de lectores y préstamos, carga de PDFs, y **búsqueda por contenido semántico** integrada en la misma barra de búsqueda, usando una base de datos vectorial propia y **Phi-3** (vía Ollama).
 
