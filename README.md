@@ -5,7 +5,50 @@ Proyecto integrador full-stack: catálogo público, gestión administrativa de l
 **Stack:** Node.js + Express (API REST) · SQLite (`better-sqlite3`) · JWT + bcrypt (login) · `multer` + `pdf-parse` (carga y lectura de PDFs) · HTML/CSS/JavaScript puro (frontend) · Ollama + Phi-3 (embeddings y base de datos vectorial).
 
 ---
+```mermaid
+flowchart LR
+    UI["Frontend<br/>HTML · CSS · JavaScript<br/>Catálogo y administración"]
 
+    subgraph BACKEND ["Backend · Node.js · Express"]
+        API["API REST<br/>Middleware · JWT"]
+        SERVICES["Servicios<br/>Libros · Usuarios · Préstamos"]
+        SEARCH["Búsqueda semántica"]
+
+        subgraph DOCS ["Procesamiento documental"]
+            PDF["Carga de PDF"]
+            TEXT["Extracción de texto"]
+            CHUNKS["Fragmentación"]
+            EMBED["Generación de embeddings"]
+            PDF --> TEXT --> CHUNKS --> EMBED
+        end
+
+        API --> SERVICES
+        API --> SEARCH
+        API --> PDF
+    end
+
+    DB[("SQLite<br/>Libros · Usuarios · Préstamos<br/>Embeddings")]
+    OLLAMA["Ollama<br/>nomic-embed-text"]
+
+    UI <-->|HTTP / JSON| API
+    SERVICES <-->|Lectura y escritura| DB
+    SEARCH <-->|Embedding de la consulta| OLLAMA
+    SEARCH <-->|Consulta de embeddings| DB
+    EMBED <-->|Texto / embeddings| OLLAMA
+    EMBED -->|Guardar embeddings| DB
+
+    classDef frontend fill:#eef2ff,stroke:#818cf8
+    classDef backend fill:#f0fdfa,stroke:#2dd4bf
+    classDef documents fill:#fff7ed,stroke:#fb923c
+    classDef storage fill:#f5f3ff,stroke:#a78bfa
+    classDef model fill:#ecfeff,stroke:#22d3ee
+
+    class UI frontend
+    class API,SERVICES,SEARCH backend
+    class PDF,TEXT,CHUNKS,EMBED documents
+    class DB storage
+    class OLLAMA model
+```
 ## 1. Instalación y ejecución
 
 ```bash
