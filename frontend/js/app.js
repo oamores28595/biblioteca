@@ -101,8 +101,37 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModa
 async function cargarCategorias() {
   estado.categorias = await api('/categorias');
   const select = document.getElementById('select-categoria');
+  const categoriaSeleccionada = select.value;
   select.innerHTML = '<option value="">Todas las categorías</option>' +
-    estado.categorias.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+    estado.categorias.map(c => `<option value="${escapeHtml(c.nombre)}">${escapeHtml(c.nombre)}</option>`).join('');
+  if (estado.categorias.some(c => c.nombre === categoriaSeleccionada)) {
+    select.value = categoriaSeleccionada;
+  }
+  if (estado.esAdmin) renderizarCategorias();
+}
+
+function renderizarCategorias() {
+  const grid = document.getElementById('grid-categorias');
+  const vacio = document.getElementById('categorias-vacio');
+  if (estado.categorias.length === 0) {
+    grid.innerHTML = '';
+    vacio.hidden = false;
+    return;
+  }
+
+  vacio.hidden = true;
+  grid.innerHTML = estado.categorias.map(c => `
+    <article class="category-card">
+      <div>
+        <h3>${escapeHtml(c.nombre)}</h3>
+        <p>${c.libros_asignados} ${c.libros_asignados === 1 ? 'libro' : 'libros'}</p>
+      </div>
+      <div class="category-actions">
+        <button class="btn btn-secondary" data-accion="editar-categoria" data-id="${c.id_categoria}">Editar</button>
+        <button class="btn btn-danger" data-accion="borrar-categoria" data-id="${c.id_categoria}">Borrar</button>
+      </div>
+    </article>
+  `).join('');
 }
 
 async function cargarLibros() {
@@ -205,6 +234,69 @@ document.getElementById('shelf-libros').addEventListener('click', manejarClicLib
 document.getElementById('shelf-sugerencias').addEventListener('click', manejarClicLibro);
 
 document.getElementById('btn-nuevo-libro').addEventListener('click', () => abrirFormularioLibro());
+
+function abrirFormularioCategoria(categoria = null) {
+  abrirModal(`
+    <h2>${categoria ? 'Editar categoría' : 'Nueva categoría'}</h2>
+    <p class="modal-sub">${categoria ? 'Actualiza el nombre de la categoría' : 'Organiza los libros del catálogo'}</p>
+    <form id="form-categoria">
+      <div class="form-field">
+        <label for="c-nombre">Nombre</label>
+        <input id="c-nombre" required maxlength="80" value="${categoria ? escapeHtml(categoria.nombre) : ''}">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelar-categoria">Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-block">${categoria ? 'Guardar cambios' : 'Crear categoría'}</button>
+      </div>
+    </form>
+  `);
+
+  document.getElementById('cancelar-categoria').addEventListener('click', cerrarModal);
+  document.getElementById('form-categoria').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('c-nombre').value.trim();
+    const ruta = categoria ? `/categorias/${categoria.id_categoria}` : '/categorias';
+    const metodo = categoria ? 'PUT' : 'POST';
+    try {
+      await api(ruta, { method: metodo, body: JSON.stringify({ nombre }) });
+      mostrarToast(categoria ? 'Categoría actualizada.' : 'Categoría creada.');
+      cerrarModal();
+      await Promise.all([cargarCategorias(), cargarLibros()]);
+    } catch (err) {
+      mostrarToast(err.message, 'error');
+    }
+  });
+}
+
+document.getElementById('btn-nueva-categoria').addEventListener('click', () => abrirFormularioCategoria());
+document.getElementById('grid-categorias').addEventListener('click', async (e) => {
+  const boton = e.target.closest('button[data-accion]');
+  if (!boton) return;
+
+  const categoria = estado.categorias.find(c => String(c.id_categoria) === boton.dataset.id);
+  if (!categoria) return;
+
+  if (boton.dataset.accion === 'editar-categoria') {
+    abrirFormularioCategoria(categoria);
+    return;
+  }
+
+  if (boton.dataset.accion === 'borrar-categoria') {
+    const cantidad = categoria.libros_asignados;
+    const detalle = cantidad
+      ? `\n\nLos ${cantidad} ${cantidad === 1 ? 'libro asignado quedará' : 'libros asignados quedarán'} sin categoría.`
+      : '';
+    if (!confirm(`¿Borrar la categoría "${categoria.nombre}"?${detalle}`)) return;
+
+    try {
+      await api(`/categorias/${categoria.id_categoria}`, { method: 'DELETE' });
+      mostrarToast('Categoría eliminada.');
+      await Promise.all([cargarCategorias(), cargarLibros()]);
+    } catch (err) {
+      mostrarToast(err.message, 'error');
+    }
+  }
+});
 
 function abrirFormularioLibro(libro = null) {
   const esEdicion = !!libro;

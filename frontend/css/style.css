@@ -249,6 +249,16 @@ input::placeholder, textarea::placeholder { color: var(--tinta-suave); opacity: 
 .stat-label { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tinta-suave); margin-top: 8px; }
 .stat-card.acento .stat-num { color: var(--sello); }
 
+.category-admin { margin-top: 42px; padding-top: 30px; border-top: 1px solid var(--linea); }
+.category-admin-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.category-admin-head h2 { font-family: var(--f-display); font-size: 28px; font-weight: 600; color: var(--verde-800); margin: 0; }
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.category-card { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; background: var(--papel-alto); border: 1px solid var(--linea); border-radius: 10px; padding: 18px; box-shadow: var(--sombra); }
+.category-card h3 { font-family: var(--f-display); font-size: 18px; font-weight: 600; color: var(--verde-950); margin: 0 0 4px; overflow-wrap: anywhere; }
+.category-card p { color: var(--tinta-suave); font-size: 13px; margin: 0; }
+.category-actions { display: flex; gap: 8px; }
+.category-actions .btn { flex: 1; padding: 8px 10px; font-size: 13px; }
+
 /* ---------------- Estado vacío ---------------- */
 .empty-state { text-align: center; color: var(--tinta-suave); padding: 60px 20px; font-size: 14.5px; }
 
@@ -304,6 +314,7 @@ input::placeholder, textarea::placeholder { color: var(--tinta-suave); opacity: 
   .app-shell { padding: 28px 18px 80px; }
   .view-head { flex-direction: column; align-items: flex-start; gap: 14px; }
   .view-head h1 { font-size: 30px; }
+  .category-admin-head { flex-direction: column; align-items: flex-start; gap: 14px; }
   .form-row { flex-direction: column; }
 }
 
