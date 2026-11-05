@@ -232,15 +232,18 @@ input::placeholder, textarea::placeholder { color: var(--tinta-suave); opacity: 
 
 /* ---------------- Lectores ---------------- */
 .reader-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.reader-card { background: var(--papel-alto); border: 1px solid var(--linea); border-radius: 10px; padding: 18px; box-shadow: var(--sombra); }
+.reader-card { background: var(--papel-alto); border: 1px solid var(--linea); border-radius: 10px; padding: 18px; box-shadow: var(--sombra); display: flex; flex-direction: column; align-items: flex-start; }
 .reader-avatar {
   width: 40px; height: 40px; border-radius: 50%; background: var(--verde-800); color: var(--papel-alto);
   display: flex; align-items: center; justify-content: center; font-family: var(--f-display); font-weight: 600; font-size: 16px;
   margin-bottom: 12px;
 }
 .reader-name { font-family: var(--f-display); font-size: 17px; font-weight: 600; margin: 0 0 2px; color: var(--verde-950); }
-.reader-mail { font-size: 13px; color: var(--tinta-suave); margin: 0 0 12px; }
+.reader-mail { font-size: 13px; color: var(--tinta-suave); margin: 0 0 8px; overflow-wrap: anywhere; }
 .reader-stat { font-family: var(--f-mono); font-size: 12px; color: var(--latón); }
+.reader-loans { font-size: 12px; color: var(--tinta-suave); margin: 12px 0; }
+.reader-actions { display: flex; gap: 8px; width: 100%; margin-top: auto; }
+.reader-actions .btn { flex: 1; padding: 8px 10px; font-size: 13px; }
 
 /* ---------------- Panel / estadísticas ---------------- */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }

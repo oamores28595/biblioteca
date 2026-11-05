@@ -520,31 +520,41 @@ function renderizarUsuarios() {
       <div class="reader-avatar">${iniciales(u.nombre_completo)}</div>
       <h2 class="reader-name">${escapeHtml(u.nombre_completo)}</h2>
       <p class="reader-mail">${escapeHtml(u.correo)}</p>
+      ${u.telefono ? `<p class="reader-mail">${escapeHtml(u.telefono)}</p>` : ''}
       <span class="reader-stat">Lector desde ${formatearFecha(u.fecha_registro)}</span>
+      <p class="reader-loans">${u.total_prestamos} ${u.total_prestamos === 1 ? 'préstamo registrado' : 'préstamos registrados'}</p>
+      <div class="reader-actions">
+        <button class="btn btn-secondary" data-accion="editar-lector" data-id="${u.id_usuario}">Editar</button>
+        <button class="btn btn-danger" data-accion="borrar-lector" data-id="${u.id_usuario}" ${u.total_prestamos > 0 ? 'disabled title="No se puede borrar un lector con historial de préstamos"' : ''}>Borrar</button>
+      </div>
     </article>
   `).join('');
 }
 
 document.getElementById('btn-nuevo-usuario').addEventListener('click', () => {
+  abrirFormularioUsuario();
+});
+
+function abrirFormularioUsuario(usuario = null) {
   abrirModal(`
-    <h2>Registrar lector</h2>
-    <p class="modal-sub">Nueva ficha de socio</p>
+    <h2>${usuario ? 'Editar lector' : 'Registrar lector'}</h2>
+    <p class="modal-sub">${usuario ? 'Actualiza los datos del lector' : 'Nueva ficha de socio'}</p>
     <form id="form-usuario">
       <div class="form-field">
         <label for="u-nombre">Nombre completo</label>
-        <input id="u-nombre" required>
+        <input id="u-nombre" required maxlength="120" value="${usuario ? escapeHtml(usuario.nombre_completo) : ''}">
       </div>
       <div class="form-field">
         <label for="u-correo">Correo</label>
-        <input id="u-correo" type="email" required>
+        <input id="u-correo" type="email" maxlength="254" required value="${usuario ? escapeHtml(usuario.correo) : ''}">
       </div>
       <div class="form-field">
         <label for="u-telefono">Teléfono</label>
-        <input id="u-telefono">
+        <input id="u-telefono" maxlength="30" value="${usuario?.telefono ? escapeHtml(usuario.telefono) : ''}">
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" id="cancelar-usuario">Cancelar</button>
-        <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+        <button type="submit" class="btn btn-primary btn-block">${usuario ? 'Guardar cambios' : 'Registrar'}</button>
       </div>
     </form>
   `);
@@ -558,14 +568,46 @@ document.getElementById('btn-nuevo-usuario').addEventListener('click', () => {
       telefono: document.getElementById('u-telefono').value.trim() || null,
     };
     try {
-      await api('/usuarios', { method: 'POST', body: JSON.stringify(payload) });
-      mostrarToast('Lector registrado.');
+      await api(usuario ? `/usuarios/${usuario.id_usuario}` : '/usuarios', {
+        method: usuario ? 'PUT' : 'POST',
+        body: JSON.stringify(payload),
+      });
+      mostrarToast(usuario ? 'Datos del lector actualizados.' : 'Lector registrado.');
       cerrarModal();
-      cargarUsuarios();
+      await Promise.all([cargarUsuarios(), cargarPrestamos()]);
     } catch (err) {
       mostrarToast(err.message, 'error');
     }
   });
+}
+
+document.getElementById('grid-usuarios').addEventListener('click', async (e) => {
+  const boton = e.target.closest('button[data-accion]');
+  if (!boton) return;
+
+  const usuario = estado.usuarios.find(u => String(u.id_usuario) === boton.dataset.id);
+  if (!usuario) return;
+
+  if (boton.dataset.accion === 'editar-lector') {
+    abrirFormularioUsuario(usuario);
+    return;
+  }
+
+  if (boton.dataset.accion === 'borrar-lector') {
+    if (usuario.total_prestamos > 0) {
+      mostrarToast('No se puede borrar un lector con historial de préstamos.', 'error');
+      return;
+    }
+    if (!confirm(`¿Borrar el lector "${usuario.nombre_completo}"? Esta acción no se puede deshacer.`)) return;
+
+    try {
+      await api(`/usuarios/${usuario.id_usuario}`, { method: 'DELETE' });
+      mostrarToast('Lector eliminado.');
+      await cargarUsuarios();
+    } catch (err) {
+      mostrarToast(err.message, 'error');
+    }
+  }
 });
 
 // ============================================================
