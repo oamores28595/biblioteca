@@ -68,6 +68,18 @@ npm start
 
 Abre `http://localhost:3000`. El catálogo y la búsqueda son públicos. El botón **Acceso administrador** abre el login de las cuentas administrativas provisionadas con `npm run seed`. El registro público está deshabilitado. En bases de datos existentes, las cuentas previas no conservan permisos automáticamente: aprovisiona explícitamente las cuentas autorizadas con el seed. Conserva el mismo `JWT_SECRET` en cada reinicio del servidor y entre sus instancias; cambiarlo invalida las sesiones activas.
 
+### Pruebas de interfaz
+
+Desde la raíz del proyecto, instala las dependencias de pruebas y ejecuta Playwright:
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+La suite inicia el backend automáticamente y simula las respuestas del catálogo y del inicio de sesión para que las pruebas no dependan del contenido de la base de datos.
+
 Para dar de alta o actualizar cuentas administrativas, vuelve a ejecutar `npm run seed` con `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD` configurados para esa cuenta. Las contraseñas deben tener al menos 12 caracteres. Configura `JWT_SECRET` antes de iniciar el servidor; debe tener al menos 32 caracteres y mantenerse privado.
 
 Si tienes Ollama corriendo, después del seed puedes generar los embeddings de los libros de ejemplo:

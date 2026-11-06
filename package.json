@@ -1,0 +1,11 @@
+{
+  "name": "biblioteca-virtual",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test --config tests/playwright.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
