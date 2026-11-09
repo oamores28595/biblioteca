@@ -1,0 +1,37 @@
+
+name: CI - Biblioteca Virtual
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Pruebas del Backend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Configurar JWT
+        run: echo "JWT_SECRET=clave_pruebas_biblioteca_2026_segura_123456" >> $GITHUB_ENV
+
+      - name: Ejecutar pruebas Jest
+        run: npm test -- --runInBand
