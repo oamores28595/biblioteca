@@ -11,6 +11,9 @@ jobs:
   backend:
     name: Pruebas
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      JWT_SECRET: biblioteca-ci-only-secret-not-for-production-2026
 
     steps:
       - name: Descargar repositorio
@@ -26,8 +29,8 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Configurar JWT
-        run: echo "JWT_SECRET=clave_pruebas_biblioteca_2026_segura_123456" >> $GITHUB_ENV
+      - name: Preparar base de datos de prueba
+        run: npm run seed
 
       - name: Instalar Chromium
         run: npx playwright install --with-deps chromium
