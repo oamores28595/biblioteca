@@ -91,6 +91,24 @@ npm test
 
 La suite inicia el backend automáticamente y simula las respuestas del catálogo y del inicio de sesión para que las pruebas no dependan del contenido de la base de datos.
 
+### Pipeline de integración continua
+
+El workflow [main.yml](./.github/workflows/main.yml) se ejecuta en cada `push` o `pull_request` hacia `main`:
+
+```mermaid
+flowchart TD
+    A["Push o pull request a main"] --> B["Descargar repositorio"]
+    B --> C["Configurar Node.js 22"]
+    C --> D["Instalar dependencias con npm ci"]
+    D --> E["Configurar JWT_SECRET y preparar la base de datos"]
+    E --> F["Instalar Chromium para Playwright"]
+    F --> G["Ejecutar npm test"]
+    G --> H["Playwright inicia el backend y ejecuta las pruebas"]
+    H --> I{"¿Todas las pruebas pasan?"}
+    I -->|Sí| J["Pipeline aprobado"]
+    I -->|No| K["Pipeline falla y muestra el reporte"]
+```
+
 Para dar de alta o actualizar cuentas administrativas, vuelve a ejecutar `npm run seed` desde la raíz con `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD` configurados para esa cuenta. Las contraseñas deben tener al menos 12 caracteres. Configura `JWT_SECRET` antes de iniciar el servidor; debe tener al menos 32 caracteres y mantenerse privado.
 
 Si tienes Ollama corriendo, después del seed puedes generar los embeddings de los libros de ejemplo:
