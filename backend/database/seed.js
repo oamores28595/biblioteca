@@ -76,4 +76,4 @@ if (!ADMIN_CORREO) {
 console.log('');
 console.log('   Nota: los libros de este seed aún no tienen embeddings generados.');
 console.log('   Corre "npm run indexar" después del seed para generar sus vectores');
-console.log('   con Phi-3 (requiere que Ollama esté corriendo).');
+console.log('   con nomic-embed-text (requiere que Ollama esté corriendo).');

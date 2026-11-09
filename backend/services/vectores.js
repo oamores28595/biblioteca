@@ -1,5 +1,5 @@
 // ============================================================
-// Servicio de búsqueda vectorial (RAG ligero) usando Phi-3 vía Ollama.
+// Servicio de búsqueda vectorial (RAG ligero) usando nomic-embed-text vía Ollama.
 //
 // Cómo funciona, en resumen:
 // 1. Cuando se crea/edita un libro, tomamos su texto (título + autor +
@@ -20,7 +20,7 @@
 // ============================================================
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'phi3';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'nomic-embed-text';
 const UMBRAL_SIMILITUD = Number(process.env.OLLAMA_UMBRAL_SIMILITUD || 0.5);
 const TIMEOUT_MS = 8000;
 

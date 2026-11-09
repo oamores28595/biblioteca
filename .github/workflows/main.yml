@@ -9,12 +9,8 @@ on:
 
 jobs:
   backend:
-    name: Pruebas del Backend
+    name: Pruebas
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: backend
 
     steps:
       - name: Descargar repositorio
@@ -25,7 +21,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Instalar dependencias
         run: npm ci
@@ -33,5 +29,8 @@ jobs:
       - name: Configurar JWT
         run: echo "JWT_SECRET=clave_pruebas_biblioteca_2026_segura_123456" >> $GITHUB_ENV
 
-      - name: Ejecutar pruebas Jest
-        run: npm test -- --runInBand
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar pruebas
+        run: npm test

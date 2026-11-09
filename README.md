@@ -1,6 +1,6 @@
 # BiblioFCA — Catálogo público y administración de biblioteca
 
-Proyecto integrador full-stack: catálogo público, gestión administrativa de lectores y préstamos, carga de PDFs, y **búsqueda por contenido semántico** integrada en la misma barra de búsqueda, usando una base de datos vectorial propia y **Phi-3** (vía Ollama).
+Proyecto integrador full-stack: catálogo público, gestión administrativa de lectores y préstamos, carga de PDFs, y **búsqueda por contenido semántico** integrada en la misma barra de búsqueda, usando una base de datos vectorial propia y **nomic-embed-text** (vía Ollama).
 
 **Stack:** Node.js + Express (API REST) · SQLite (`better-sqlite3`) · JWT + bcrypt (login) · `multer` + `pdf-parse` (carga y lectura de PDFs) · HTML/CSS/JavaScript puro (frontend) · Ollama + nomic-embed-text (embeddings y base de datos vectorial).
 
@@ -51,8 +51,19 @@ flowchart LR
 ```
 ## 1. Instalación y ejecución
 
+Instala [Ollama](https://ollama.com/download) en Windows (o con WinGet):
+```powershell
+winget install --exact --id Ollama.Ollama --source winget
+```
+
+Abre Ollama desde el menú Inicio y descarga el modelo de embeddings:
+```powershell
+ollama pull nomic-embed-text
+```
+
+Ollama debe estar ejecutándose en `http://localhost:11434` para indexar libros y realizar búsquedas semánticas.
+
 ```bash
-cd backend
 npm install
 ```
 
@@ -80,7 +91,7 @@ npm test
 
 La suite inicia el backend automáticamente y simula las respuestas del catálogo y del inicio de sesión para que las pruebas no dependan del contenido de la base de datos.
 
-Para dar de alta o actualizar cuentas administrativas, vuelve a ejecutar `npm run seed` con `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD` configurados para esa cuenta. Las contraseñas deben tener al menos 12 caracteres. Configura `JWT_SECRET` antes de iniciar el servidor; debe tener al menos 32 caracteres y mantenerse privado.
+Para dar de alta o actualizar cuentas administrativas, vuelve a ejecutar `npm run seed` desde la raíz con `ADMIN_NOMBRE`, `ADMIN_CORREO` y `ADMIN_PASSWORD` configurados para esa cuenta. Las contraseñas deben tener al menos 12 caracteres. Configura `JWT_SECRET` antes de iniciar el servidor; debe tener al menos 32 caracteres y mantenerse privado.
 
 Si tienes Ollama corriendo, después del seed puedes generar los embeddings de los libros de ejemplo:
 ```bash
@@ -102,7 +113,7 @@ npm run indexar
 
 Cuando añades o editas un libro (con o sin PDF), el sistema automáticamente:
 1. Toma su título, autor, sinopsis, y el texto extraído del PDF (si tiene uno).
-2. Lo divide en fragmentos (~900 caracteres, con solape) y genera un **embedding** (vector numérico) por fragmento con Phi-3 vía Ollama.
+2. Lo divide en fragmentos (~900 caracteres, con solape) y genera un **embedding** (vector numérico) por fragmento con nomic-embed-text vía Ollama.
 3. Guarda esos vectores en la tabla `embeddings_libros` — esa tabla ES la base de datos vectorial. Todo esto corre **en segundo plano** al guardar el libro, sin bloquear la respuesta al bibliotecario.
 
 Cuando alguien busca algo en la barra de búsqueda normal del catálogo, además de los resultados exactos (por título/autor/ISBN, como siempre), el sistema:
@@ -120,11 +131,11 @@ Esto es útil si Ollama estuvo apagado mientras se cargaban libros, o si cambias
 ### Configuración (opcional, variables de entorno)
 ```bash
 export OLLAMA_URL="http://localhost:11434"
-export OLLAMA_MODEL="phi3"                 # modelo usado para los embeddings
+export OLLAMA_MODEL="nomic-embed-text"     # modelo usado para los embeddings
 export OLLAMA_UMBRAL_SIMILITUD="0.5"       # qué tan parecido debe ser algo para sugerirse (0 a 1)
 ```
 
-> **Nota sobre la calidad:** Phi-3 no es un modelo especializado en embeddings (fue diseñado para generar texto), así que las sugerencias son útiles pero no perfectas. Si más adelante quieres mejor precisión sin tocar código, instala un modelo dedicado (`ollama pull nomic-embed-text`) y cambia `OLLAMA_MODEL` a `nomic-embed-text`.
+> Si ya habías generado embeddings con otro modelo, vuelve a generarlos con `npm run indexar` después de cambiarlo. Los vectores de modelos distintos no se deben mezclar.
 
 ## 4. Carga de PDFs
 

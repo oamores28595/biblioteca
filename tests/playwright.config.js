@@ -18,7 +18,7 @@ module.exports = defineConfig({
   },
 
   webServer: {
-    command: 'npm --prefix backend start',
+    command: 'npm start',
     url: 'http://127.0.0.1:3000/api/salud',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000

@@ -1,11 +1,30 @@
 {
   "name": "biblioteca-virtual",
-  "version": "1.0.0",
+  "version": "1.1.3",
   "private": true,
+  "description": "Biblioteca virtual con API REST, catálogo público y búsqueda semántica",
+  "main": "backend/server.js",
+  "type": "commonjs",
   "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "seed": "node backend/database/seed.js",
+    "indexar": "node backend/database/indexar.js",
     "test": "playwright test --config tests/playwright.config.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0",
+    "pdf-parse": "^1.1.1"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -164,7 +164,7 @@ function renderizarLibros() {
   shelf.innerHTML = estado.libros.map(libro => tarjetaLibro(libro)).join('');
 }
 
-// Si Phi-3/Ollama no encontró nada relevante (o no está disponible), este
+// Si Ollama no encontró nada relevante (o no está disponible), este
 // bloque simplemente no se muestra — sin mensajes de error, sin paneles vacíos.
 function renderizarSugerencias() {
   const bloque = document.getElementById('bloque-sugerencias');

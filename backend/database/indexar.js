@@ -3,9 +3,9 @@
 // por contenido. Útil después de correr el seed, o si Ollama estuvo
 // caído mientras se añadían libros y quedaron sin sus embeddings.
 //
-// Uso: npm run indexar   (dentro de la carpeta backend)
+// Uso: npm run indexar   (desde la raíz del proyecto)
 // Requiere que Ollama esté corriendo con el modelo configurado
-// (por defecto "phi3") accesible en OLLAMA_URL (por defecto localhost:11434).
+// (por defecto "nomic-embed-text") accesible en OLLAMA_URL (por defecto localhost:11434).
 // ============================================================
 const path = require('path');
 const fs = require('fs');
